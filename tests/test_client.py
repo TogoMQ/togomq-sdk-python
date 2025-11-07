@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, Mock, patch
 
 import grpc
 import pytest
-from mq.v1 import mq_pb2, mq_pb2_grpc
+from mq.v1 import mq_pb2
 
 from togomq.client import Client, PublishResponse
 from togomq.config import Config
@@ -25,7 +25,7 @@ def mock_channel():
 @pytest.fixture
 def mock_stub():
     """Create a mock gRPC stub."""
-    stub = MagicMock(spec=mq_pb2_grpc.MqServiceStub)
+    stub = MagicMock()
 
     # Mock health check to succeed
     health_response = mq_pb2.HealthCheckResponse(alive=True)
@@ -88,7 +88,7 @@ class TestClient:
 
     def test_client_connection_failure(self, mock_channel) -> None:
         """Test client connection failure."""
-        stub = MagicMock(spec=mq_pb2_grpc.MqServiceStub)
+        stub = MagicMock()
         stub.HealthCheck.side_effect = grpc.RpcError()
 
         with patch("togomq.client.mq_pb2_grpc.MqServiceStub", return_value=stub):

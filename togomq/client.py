@@ -149,6 +149,12 @@ class Client:
                 message="Cannot publish empty message list",
             )
 
+        if self._stub is None:
+            raise TogoMQError(
+                code=ErrorCode.CONNECTION,
+                message="Client not connected",
+            )
+
         try:
             self.logger.debug(f"Publishing batch of {len(messages)} messages")
 
@@ -201,6 +207,12 @@ class Client:
         Raises:
             TogoMQError: If publishing fails.
         """
+        if self._stub is None:
+            raise TogoMQError(
+                code=ErrorCode.CONNECTION,
+                message="Client not connected",
+            )
+
         try:
             self.logger.debug("Starting streaming publish")
 
@@ -255,6 +267,12 @@ class Client:
             raise TogoMQError(
                 code=ErrorCode.VALIDATION,
                 message="Topic is required for subscription",
+            )
+
+        if self._stub is None:
+            raise TogoMQError(
+                code=ErrorCode.CONNECTION,
+                message="Client not connected",
             )
 
         try:
