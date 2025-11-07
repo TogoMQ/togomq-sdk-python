@@ -1,7 +1,7 @@
 """Unit tests for client module."""
 
 from collections.abc import Generator
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock, patch
 
 import grpc
 import pytest
@@ -12,6 +12,21 @@ from togomq.config import Config
 from togomq.errors import ErrorCode, TogoMQError
 from togomq.message import Message
 from togomq.subscribe_options import SubscribeOptions
+
+
+# Create a concrete RpcError for testing
+class MockRpcError(grpc.RpcError):
+    """Mock RpcError for testing."""
+
+    def __init__(self, code=None, details=""):
+        self._code = code
+        self._details = details
+
+    def code(self):
+        return self._code
+
+    def details(self):
+        return self._details
 
 
 @pytest.fixture
@@ -106,17 +121,20 @@ class TestClient:
 
             with Client(config) as client:
                 assert client._channel is not None
+                channel = client._channel
 
             # Channel should be closed after context
-            client._channel.close.assert_called_once()
+            channel.close.assert_called_once()
+            assert client._channel is None
 
     def test_client_close(self, client) -> None:
         """Test client close method."""
         assert client._channel is not None
+        channel = client._channel
 
         client.close()
 
-        client._channel.close.assert_called_once()
+        channel.close.assert_called_once()
         assert client._channel is None
         assert client._stub is None
 
@@ -154,12 +172,15 @@ class TestClient:
 
     def test_pub_batch_grpc_error(self, client, mock_stub) -> None:
         """Test handling gRPC error in pub_batch."""
-        mock_stub.Pub.side_effect = grpc.RpcError()
+        error = MockRpcError(code=grpc.StatusCode.UNAVAILABLE, details="Service unavailable")
+        mock_stub.Pub.side_effect = error
 
         messages = [Message("topic", b"body")]
 
-        with pytest.raises(TogoMQError):
+        with pytest.raises(TogoMQError) as exc_info:
             client.pub_batch(messages)
+
+        assert exc_info.value.code == ErrorCode.CONNECTION
 
     def test_pub_streaming_success(self, client, mock_stub) -> None:
         """Test successful streaming publishing."""
@@ -213,7 +234,7 @@ class TestClient:
 
     def test_handle_grpc_error_unauthenticated(self, client) -> None:
         """Test handling unauthenticated error."""
-        error = Mock(spec=grpc.RpcError)
+        error = MagicMock()
         error.code.return_value = grpc.StatusCode.UNAUTHENTICATED
         error.details.return_value = "Invalid token"
 
@@ -224,7 +245,7 @@ class TestClient:
 
     def test_handle_grpc_error_invalid_argument(self, client) -> None:
         """Test handling invalid argument error."""
-        error = Mock(spec=grpc.RpcError)
+        error = MagicMock()
         error.code.return_value = grpc.StatusCode.INVALID_ARGUMENT
         error.details.return_value = "Invalid request"
 
@@ -235,7 +256,7 @@ class TestClient:
 
     def test_handle_grpc_error_unavailable(self, client) -> None:
         """Test handling unavailable error."""
-        error = Mock(spec=grpc.RpcError)
+        error = MagicMock()
         error.code.return_value = grpc.StatusCode.UNAVAILABLE
         error.details.return_value = "Service unavailable"
 
