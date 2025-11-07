@@ -146,10 +146,13 @@ jobs:
         import re
         with open("pyproject.toml", "r") as f:
             content = f.read()
+        # Only update version in [project] section
         content = re.sub(
-            r"version = \"([^\"]+)\"",
-            f"version = \"'"$NEW_VERSION"'\"",
-            content
+            r"(\[project\][^\[]*?)\bversion\s*=\s*\"[^\"]+\"",
+            r"\1version = \"'"$NEW_VERSION"'\"",
+            content,
+            count=1,
+            flags=re.DOTALL
         )
         with open("pyproject.toml", "w") as f:
             f.write(content)
