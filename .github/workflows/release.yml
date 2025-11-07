@@ -142,21 +142,7 @@ jobs:
         '
         
         # Update pyproject.toml
-        python -c '
-        import re
-        with open("pyproject.toml", "r") as f:
-            content = f.read()
-        # Only update version in [project] section
-        content = re.sub(
-            r"(\[project\][^\[]*?)\bversion\s*=\s*\"[^\"]+\"",
-            r"\1version = \"'"$NEW_VERSION"'\"",
-            content,
-            count=1,
-            flags=re.DOTALL
-        )
-        with open("pyproject.toml", "w") as f:
-            f.write(content)
-        '
+        sed -i "s/^version = \".*\"/version = \"$NEW_VERSION\"/" pyproject.toml
         
         echo "Updated version to $NEW_VERSION in all files"
     
