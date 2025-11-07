@@ -1,4 +1,5 @@
 """Unit tests for errors module."""
+
 import pytest
 
 from togomq.errors import ErrorCode, TogoMQError

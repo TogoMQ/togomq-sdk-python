@@ -1,4 +1,5 @@
 """TogoMQ client implementation."""
+
 from collections.abc import Generator, Iterator
 from typing import Optional
 

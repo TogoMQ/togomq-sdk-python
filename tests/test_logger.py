@@ -1,4 +1,5 @@
 """Unit tests for logger module."""
+
 import logging
 
 from togomq.logger import LogLevel, get_logger, setup_logger

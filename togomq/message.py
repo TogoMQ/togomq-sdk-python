@@ -1,4 +1,5 @@
 """Message model for TogoMQ SDK."""
+
 from typing import Optional
 
 

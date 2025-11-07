@@ -1,4 +1,5 @@
 """Unit tests for configuration module."""
+
 import pytest
 
 from togomq.config import Config

@@ -1,4 +1,5 @@
 """Example: Subscribing to messages from TogoMQ."""
+
 import signal
 from typing import Optional
 

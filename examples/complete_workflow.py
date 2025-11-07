@@ -1,4 +1,5 @@
 """Example: Complete TogoMQ workflow."""
+
 import threading
 import time
 

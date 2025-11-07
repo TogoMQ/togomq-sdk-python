@@ -1,4 +1,5 @@
 """Error handling for TogoMQ SDK."""
+
 from enum import Enum
 from typing import Optional
 

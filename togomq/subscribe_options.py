@@ -1,4 +1,5 @@
 """Subscribe options for TogoMQ client."""
+
 from typing import Optional
 
 

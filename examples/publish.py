@@ -1,4 +1,5 @@
 """Example: Publishing messages to TogoMQ."""
+
 import time
 from collections.abc import Generator
 

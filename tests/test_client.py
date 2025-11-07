@@ -1,4 +1,5 @@
 """Unit tests for client module."""
+
 from collections.abc import Generator
 from unittest.mock import MagicMock, Mock, patch
 

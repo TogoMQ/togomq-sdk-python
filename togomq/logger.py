@@ -1,4 +1,5 @@
 """Logging configuration for TogoMQ SDK."""
+
 import logging
 
 

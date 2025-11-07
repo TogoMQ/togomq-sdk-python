@@ -1,4 +1,5 @@
 """Configuration for TogoMQ client."""
+
 from typing import Optional
 
 from togomq.errors import ErrorCode, TogoMQError
