@@ -8,7 +8,7 @@ __version__ = "0.1.0"
 
 from togomq.client import Client
 from togomq.config import Config
-from togomq.errors import TogoMQError, ErrorCode
+from togomq.errors import ErrorCode, TogoMQError
 from togomq.message import Message
 from togomq.subscribe_options import SubscribeOptions
 

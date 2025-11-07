@@ -1,6 +1,5 @@
 """Logging configuration for TogoMQ SDK."""
 import logging
-from typing import Optional
 
 
 class LogLevel:
@@ -33,22 +32,22 @@ def setup_logger(name: str, level: str = LogLevel.INFO) -> logging.Logger:
         A configured logger instance.
     """
     logger = logging.getLogger(name)
-    
+
     # Remove any existing handlers
     logger.handlers = []
-    
+
     # Set the log level
     log_level = _LEVEL_MAP.get(level.lower(), logging.INFO)
     logger.setLevel(log_level)
-    
+
     # Don't propagate to root logger
     logger.propagate = False
-    
+
     # Only add handler if not "none"
     if level.lower() != LogLevel.NONE:
         handler = logging.StreamHandler()
         handler.setLevel(log_level)
-        
+
         # Create formatter
         formatter = logging.Formatter(
             fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -56,7 +55,7 @@ def setup_logger(name: str, level: str = LogLevel.INFO) -> logging.Logger:
         )
         handler.setFormatter(formatter)
         logger.addHandler(handler)
-    
+
     return logger
 
 

@@ -73,7 +73,13 @@ class Config:
                 message="Port must be an integer between 1 and 65535",
             )
 
-        valid_log_levels = {LogLevel.DEBUG, LogLevel.INFO, LogLevel.WARN, LogLevel.ERROR, LogLevel.NONE}
+        valid_log_levels = {
+            LogLevel.DEBUG,
+            LogLevel.INFO,
+            LogLevel.WARN,
+            LogLevel.ERROR,
+            LogLevel.NONE,
+        }
         if self.log_level.lower() not in valid_log_levels:
             raise TogoMQError(
                 code=ErrorCode.CONFIGURATION,

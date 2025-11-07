@@ -1,6 +1,6 @@
 """Example: Publishing messages to TogoMQ."""
 import time
-from typing import Generator
+from collections.abc import Generator
 
 from togomq import Client, Config, Message
 
@@ -17,9 +17,7 @@ def example_batch_publish() -> None:
         # Create messages - topic is required for each message
         messages = [
             Message("orders", b"order-1"),
-            Message("orders", b"order-2").with_variables(
-                {"priority": "high", "customer": "12345"}
-            ),
+            Message("orders", b"order-2").with_variables({"priority": "high", "customer": "12345"}),
             Message("orders", b"order-3")
             .with_postpone(60)  # Delay 60 seconds
             .with_retention(3600),  # Keep for 1 hour
@@ -79,7 +77,7 @@ def example_error_handling() -> None:
     """Demonstrate error handling."""
     print("\n=== Error Handling Example ===\n")
 
-    from togomq import TogoMQError, ErrorCode
+    from togomq import ErrorCode, TogoMQError
 
     try:
         # Invalid config (empty token)
@@ -106,7 +104,7 @@ def example_error_handling() -> None:
         else:
             print(f"Error: {e}")
     finally:
-        if 'client' in locals():
+        if "client" in locals():
             client.close()
 
 

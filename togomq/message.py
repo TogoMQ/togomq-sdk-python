@@ -1,5 +1,5 @@
 """Message model for TogoMQ SDK."""
-from typing import Dict, Optional
+from typing import Optional
 
 
 class Message:
@@ -23,7 +23,7 @@ class Message:
         self,
         topic: str,
         body: Optional[bytes] = None,
-        variables: Optional[Dict[str, str]] = None,
+        variables: Optional[dict[str, str]] = None,
         postpone: Optional[int] = None,
         retention: Optional[int] = None,
         uuid: Optional[str] = None,
@@ -45,7 +45,7 @@ class Message:
         self.retention = retention if retention is not None else 0
         self.uuid = uuid
 
-    def with_variables(self, variables: Dict[str, str]) -> "Message":
+    def with_variables(self, variables: dict[str, str]) -> "Message":
         """Set message variables (builder pattern).
 
         Args:

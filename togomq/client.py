@@ -1,12 +1,13 @@
 """TogoMQ client implementation."""
-from typing import Iterator, List, Optional, Tuple, Generator
+from collections.abc import Generator, Iterator
+from typing import Optional
 
 import grpc
 from mq.v1 import mq_pb2, mq_pb2_grpc
 
 from togomq.config import Config
 from togomq.errors import ErrorCode, TogoMQError
-from togomq.logger import get_logger, setup_logger
+from togomq.logger import setup_logger
 from togomq.message import Message
 from togomq.subscribe_options import SubscribeOptions
 
@@ -96,7 +97,7 @@ class Client:
                     code=ErrorCode.CONNECTION,
                     message="Failed to connect to TogoMQ server",
                     details=str(e),
-                )
+                ) from e
 
         except grpc.RpcError as e:
             self.logger.error(f"Connection failed: {e}")
@@ -104,9 +105,9 @@ class Client:
                 code=ErrorCode.CONNECTION,
                 message="Failed to establish connection",
                 details=str(e),
-            )
+            ) from e
 
-    def _get_metadata(self) -> List[Tuple[str, str]]:
+    def _get_metadata(self) -> list[tuple[str, str]]:
         """Get gRPC metadata for authentication.
 
         Returns:
@@ -130,7 +131,7 @@ class Client:
         """Context manager exit."""
         self.close()
 
-    def pub_batch(self, messages: List[Message]) -> PublishResponse:
+    def pub_batch(self, messages: list[Message]) -> PublishResponse:
         """Publish a batch of messages.
 
         Args:
@@ -174,8 +175,7 @@ class Client:
 
             # Create request iterator
             def request_iterator() -> Iterator[mq_pb2.PubMessageRequest]:
-                for pb_msg in pb_messages:
-                    yield pb_msg
+                yield from pb_messages
 
             # Call gRPC
             metadata = self._get_metadata()
@@ -239,7 +239,7 @@ class Client:
 
     def sub(
         self, options: SubscribeOptions
-    ) -> Tuple[Generator[Message, None, None], Generator[Exception, None, None]]:
+    ) -> tuple[Generator[Message, None, None], Generator[Exception, None, None]]:
         """Subscribe to messages.
 
         Args:

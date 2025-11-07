@@ -1,6 +1,6 @@
 """Unit tests for client module."""
+from collections.abc import Generator
 from unittest.mock import MagicMock, Mock, patch
-from typing import Generator
 
 import grpc
 import pytest
@@ -26,11 +26,11 @@ def mock_channel():
 def mock_stub():
     """Create a mock gRPC stub."""
     stub = MagicMock(spec=mq_pb2_grpc.MqServiceStub)
-    
+
     # Mock health check to succeed
     health_response = mq_pb2.HealthCheckResponse(alive=True)
     stub.HealthCheck.return_value = health_response
-    
+
     return stub
 
 
@@ -56,7 +56,7 @@ class TestPublishResponse:
         """Test publish response repr."""
         response = PublishResponse(messages_received=10)
         repr_str = repr(response)
-        
+
         assert "PublishResponse" in repr_str
         assert "10" in repr_str
 
@@ -69,11 +69,11 @@ class TestClient:
         with patch("togomq.client.mq_pb2_grpc.MqServiceStub", return_value=mock_stub):
             config = Config(token="test-token")
             client = Client(config)
-            
+
             assert client.config == config
             assert client._channel is not None
             assert client._stub is not None
-            
+
             client.close()
 
     def test_client_creation_insecure(self, mock_stub) -> None:
@@ -82,7 +82,7 @@ class TestClient:
             with patch("togomq.client.mq_pb2_grpc.MqServiceStub", return_value=mock_stub):
                 config = Config(token="test-token", use_tls=False)
                 client = Client(config)
-                
+
                 mock_channel.assert_called_once()
                 client.close()
 
@@ -90,31 +90,31 @@ class TestClient:
         """Test client connection failure."""
         stub = MagicMock(spec=mq_pb2_grpc.MqServiceStub)
         stub.HealthCheck.side_effect = grpc.RpcError()
-        
+
         with patch("togomq.client.mq_pb2_grpc.MqServiceStub", return_value=stub):
             with pytest.raises(TogoMQError) as exc_info:
                 config = Config(token="test-token")
                 Client(config)
-            
+
             assert exc_info.value.code == ErrorCode.CONNECTION
 
     def test_client_context_manager(self, mock_channel, mock_stub) -> None:
         """Test client as context manager."""
         with patch("togomq.client.mq_pb2_grpc.MqServiceStub", return_value=mock_stub):
             config = Config(token="test-token")
-            
+
             with Client(config) as client:
                 assert client._channel is not None
-            
+
             # Channel should be closed after context
             client._channel.close.assert_called_once()
 
     def test_client_close(self, client) -> None:
         """Test client close method."""
         assert client._channel is not None
-        
+
         client.close()
-        
+
         client._channel.close.assert_called_once()
         assert client._channel is None
         assert client._stub is None
@@ -124,14 +124,14 @@ class TestClient:
         # Mock successful publish
         pub_response = mq_pb2.PubMessageResponse(messages_received=2)
         mock_stub.Pub.return_value = pub_response
-        
+
         messages = [
             Message("topic1", b"body1"),
             Message("topic2", b"body2"),
         ]
-        
+
         response = client.pub_batch(messages)
-        
+
         assert response.messages_received == 2
         mock_stub.Pub.assert_called_once()
 
@@ -139,24 +139,24 @@ class TestClient:
         """Test publishing empty message list raises error."""
         with pytest.raises(TogoMQError) as exc_info:
             client.pub_batch([])
-        
+
         assert exc_info.value.code == ErrorCode.VALIDATION
 
     def test_pub_batch_missing_topic(self, client) -> None:
         """Test publishing message without topic raises error."""
         messages = [Message("", b"body")]
-        
+
         with pytest.raises(TogoMQError) as exc_info:
             client.pub_batch(messages)
-        
+
         assert exc_info.value.code == ErrorCode.VALIDATION
 
     def test_pub_batch_grpc_error(self, client, mock_stub) -> None:
         """Test handling gRPC error in pub_batch."""
         mock_stub.Pub.side_effect = grpc.RpcError()
-        
+
         messages = [Message("topic", b"body")]
-        
+
         with pytest.raises(TogoMQError):
             client.pub_batch(messages)
 
@@ -164,13 +164,13 @@ class TestClient:
         """Test successful streaming publishing."""
         pub_response = mq_pb2.PubMessageResponse(messages_received=3)
         mock_stub.Pub.return_value = pub_response
-        
+
         def message_gen() -> Generator[Message, None, None]:
             for i in range(3):
                 yield Message(f"topic-{i}", f"body-{i}".encode())
-        
+
         response = client.pub(message_gen())
-        
+
         assert response.messages_received == 3
         mock_stub.Pub.assert_called_once()
 
@@ -182,12 +182,12 @@ class TestClient:
             mq_pb2.SubMessageResponse(topic="topic2", uuid="uuid2", body=b"body2"),
         ]
         mock_stub.Sub.return_value = iter(pb_messages)
-        
+
         options = SubscribeOptions("test-topic")
         msg_gen, err_gen = client.sub(options)
-        
+
         messages = list(msg_gen)
-        
+
         assert len(messages) == 2
         assert messages[0].topic == "topic1"
         assert messages[0].uuid == "uuid1"
@@ -196,16 +196,16 @@ class TestClient:
     def test_sub_missing_topic(self, client) -> None:
         """Test subscription without topic raises error."""
         options = SubscribeOptions("")
-        
+
         with pytest.raises(TogoMQError) as exc_info:
             client.sub(options)
-        
+
         assert exc_info.value.code == ErrorCode.VALIDATION
 
     def test_get_metadata(self, client) -> None:
         """Test metadata generation for authentication."""
         metadata = client._get_metadata()
-        
+
         assert len(metadata) == 1
         assert metadata[0][0] == "authorization"
         assert metadata[0][1] == "Bearer test-token"
@@ -215,10 +215,10 @@ class TestClient:
         error = Mock(spec=grpc.RpcError)
         error.code.return_value = grpc.StatusCode.UNAUTHENTICATED
         error.details.return_value = "Invalid token"
-        
+
         with pytest.raises(TogoMQError) as exc_info:
             client._handle_grpc_error(error, ErrorCode.PUBLISH)
-        
+
         assert exc_info.value.code == ErrorCode.AUTH
 
     def test_handle_grpc_error_invalid_argument(self, client) -> None:
@@ -226,10 +226,10 @@ class TestClient:
         error = Mock(spec=grpc.RpcError)
         error.code.return_value = grpc.StatusCode.INVALID_ARGUMENT
         error.details.return_value = "Invalid request"
-        
+
         with pytest.raises(TogoMQError) as exc_info:
             client._handle_grpc_error(error, ErrorCode.PUBLISH)
-        
+
         assert exc_info.value.code == ErrorCode.VALIDATION
 
     def test_handle_grpc_error_unavailable(self, client) -> None:
@@ -237,8 +237,8 @@ class TestClient:
         error = Mock(spec=grpc.RpcError)
         error.code.return_value = grpc.StatusCode.UNAVAILABLE
         error.details.return_value = "Service unavailable"
-        
+
         with pytest.raises(TogoMQError) as exc_info:
             client._handle_grpc_error(error, ErrorCode.PUBLISH)
-        
+
         assert exc_info.value.code == ErrorCode.CONNECTION

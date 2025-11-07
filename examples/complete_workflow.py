@@ -1,7 +1,6 @@
 """Example: Complete TogoMQ workflow."""
 import threading
 import time
-from typing import Generator
 
 from togomq import Client, Config, Message, SubscribeOptions
 

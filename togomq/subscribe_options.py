@@ -6,9 +6,12 @@ class SubscribeOptions:
     """Options for subscribing to messages.
 
     Attributes:
-        topic: Topic to subscribe to (required). Use "*" for all topics, or wildcards like "orders.*".
-        batch: Maximum number of messages to receive at once (default: 0 = server default 1000).
-        speed_per_sec: Rate limit for message delivery per second (default: 0 = unlimited).
+        topic: Topic to subscribe to (required). Use "*" for all topics,
+            or wildcards like "orders.*".
+        batch: Maximum number of messages to receive at once
+            (default: 0 = server default 1000).
+        speed_per_sec: Rate limit for message delivery per second
+            (default: 0 = unlimited).
     """
 
     def __init__(

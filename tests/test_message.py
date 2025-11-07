@@ -1,5 +1,4 @@
 """Unit tests for message module."""
-import pytest
 
 from togomq.message import Message
 

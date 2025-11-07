@@ -1,6 +1,5 @@
 """Example: Subscribing to messages from TogoMQ."""
 import signal
-import sys
 from typing import Optional
 
 from togomq import Client, Config, SubscribeOptions
@@ -136,7 +135,7 @@ def example_error_handling() -> None:
     """Demonstrate subscription error handling."""
     print("\n=== Subscription Error Handling Example ===\n")
 
-    from togomq import TogoMQError, ErrorCode
+    from togomq import ErrorCode, TogoMQError
 
     config = Config(token="your-token-here")
 

@@ -1,5 +1,4 @@
 """Unit tests for subscribe options module."""
-import pytest
 
 from togomq.subscribe_options import SubscribeOptions
 
