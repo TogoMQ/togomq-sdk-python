@@ -3,6 +3,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/togomq-sdk.svg)](https://pypi.org/project/togomq-sdk/)
 [![Python versions](https://img.shields.io/pypi/pyversions/togomq-sdk.svg)](https://pypi.org/project/togomq-sdk/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/TogoMQ/togomq-sdk-python/actions/workflows/ci.yml/badge.svg)](https://github.com/TogoMQ/togomq-sdk-python/actions/workflows/ci.yml)
 
 The official Python SDK for [TogoMQ](https://togomq.io/) - a modern, high-performance message queue service. This SDK provides a simple and intuitive API for publishing and subscribing to messages using gRPC streaming.
 
