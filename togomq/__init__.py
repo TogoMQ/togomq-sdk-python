@@ -4,7 +4,7 @@ The official Python SDK for TogoMQ - a modern, high-performance message queue se
 This SDK provides a simple and intuitive API for publishing and subscribing to messages using gRPC.
 """
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 from togomq.client import Client
 from togomq.config import Config
